@@ -102,7 +102,7 @@
           // })
 
 
-          this.$http.post('Meeting/AddList',obj).then(function (res) {
+          this.$http.get('Meeting/GetList',{params:obj}).then(function (res) {
             console.log(res)
           })
       }
