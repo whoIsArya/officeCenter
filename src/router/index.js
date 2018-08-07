@@ -12,7 +12,8 @@ export default {
       path: '/home',
       name: 'home',
       component: Home,
-      children: modules
+      children: modules,
+      redirect: { name: 'meeting_manage' }
     }
   ]
 }
