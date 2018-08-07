@@ -2,7 +2,7 @@ import Home from '@/components/Home';
 import modules from '@/router/modules';
 
 export default {
-  mode: 'history',
+  // mode: 'history',
   routes: [
     {
       path: '*',
