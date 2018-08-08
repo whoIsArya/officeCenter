@@ -54,16 +54,17 @@
               key: 'operate',
               align: 'center',
               render: (h,params) => {
-                return h('a',{
-                  style: {
-                    color: '#2d8cf0'
+                return h('Icon',{
+                  props: {
+                    type: 'compose',
+                    size: 20
                   },
                   on: {
                     click: () => {
 
                     }
                   }
-                },'修改')
+                })
               }
             }
           ],
@@ -84,8 +85,8 @@
       },
       mounted(){
         var obj = {
-          page: 1,
-          limit: 10
+          Title: 123,
+          BoardroomId: 456
         }
 
           // this.$http({
@@ -102,7 +103,7 @@
           // })
 
 
-          this.$http.get('Meeting/GetList',{params:obj}).then(function (res) {
+          this.$http.post('Meeting/addList',obj).then(function (res) {
             console.log(res)
           })
       }
