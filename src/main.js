@@ -15,7 +15,7 @@ Vue.use(iView);
 var router = new Router(routerConfig);
 // axios.defaults.headers['Content-Type'] = 'application/x-www-form-urlencoded; charset=UTF-8';
 let ajax = axios.create({
-  baseURL: 'http://47.100.35.159:8001/API/'
+  baseURL: '/API/'
 });
 
 Vue.prototype.$http= ajax;

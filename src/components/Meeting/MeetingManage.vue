@@ -13,13 +13,20 @@
 <template>
     <div>
       <div class="oper-group">
-        <Button type="primary">添加会议室</Button>
-        <Button type="primary">删除会议室</Button>
+        <Button type="primary" @click="handleMeeting('add')">添加会议室</Button>
+        <Button type="primary" @click="handleMeeting('del')">删除会议室</Button>
       </div>
       <Table border ref="selection" :columns="columns1" :data="data1"></Table>
       <div class="pagination">
         <Page :total="100" show-total show-sizer show-elevator/>
       </div>
+      <Modal v-model="myModal" :title="modalTitle">
+        <div>abc</div>
+        <div slot="footer">
+          <Button type="primary">保存</Button>
+          <Button type="primary">返回</Button>
+        </div>
+      </Modal>
     </div>
 </template>
 
@@ -28,6 +35,8 @@
       name: "MeetingManage",
       data(){
         return {
+          myModal: false,
+          modalTitle: '标题',
           page:1,
           limit: 10,
           columns1: [
@@ -61,9 +70,9 @@
                     type: 'compose',
                     size: 20
                   },
-                  on: {
+                  nativeOn: {
                     click: () => {
-
+                      this.handleMeeting('edit');
                     }
                   }
                 })
@@ -71,6 +80,12 @@
             }
           ],
           data1: []
+        }
+      },
+      methods: {
+        handleMeeting: (str)=>{
+          this.myModal = true;
+          this.modalTitle = str === 'add' ? '会议申请-添加' : str === 'edit'? '会议申请-修改': '会议申请-删除'
         }
       },
       mounted(){
