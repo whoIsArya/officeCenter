@@ -52,9 +52,11 @@
 
 <script>
     export default {
-        name: "MeetingApply",
+      name: "MeetingApply",
       data(){
         return {
+          page:1,
+          limit:10,
           searchRoom: '',
           searchDate: [],
           roomList: [
@@ -74,39 +76,39 @@
             },{
               title: '序号',
               width: 70,
-              key: 'id',
+              key: 'Id',
               align: 'center'
             },{
               title: '会议标题',
-              key: 'title',
+              key: 'Title',
               align: 'center'
             },{
               title: '会议室',
-              key: 'boardroomId',
+              key: 'BoardroomName',
               align: 'center'
             },{
               title: '使用日期',
-              key: 'useDate',
+              key: 'UseDate',
               align: 'center'
             },{
               title: '开始时间',
-              key: 'useTimeB',
+              key: 'UseTimeB',
               align: 'center'
             },{
               title: '结束时间',
-              key: 'useTimeE',
+              key: 'UseTimeE',
               align: 'center'
             },{
               title: '申请日期',
-              key: 'applyDate',
+              key: 'ApplyDate',
               align: 'center'
             },{
               title: '申请人',
-              key: 'applicant',
+              key: 'Applicant',
               align: 'center'
             },{
               title: '状态',
-              key: 'status',
+              key: 'Status',
               align: 'center'
             },{
               title: '操作',
@@ -114,7 +116,7 @@
               align: 'center',
               render: (h,params) => {
                 const row = params.row;
-                const text = row.id === 1 ? '查看' :  '编辑';
+                const text = row.Id === 1 ? '查看' :  '编辑';
                 return h('a',{
                   style: {
                     color: '#2d8cf0'
@@ -128,30 +130,22 @@
               }
             }
           ],
-          data1: [
-            {
-              id: 1,
-              title: '开会',
-              boardroomId: '第一会议室',
-              useDate: '20180302',
-              useTimeB: '09:00',
-              useTimeE: '12:00',
-              applyDate: '20180201',
-              applicant: '小A',
-              status: '已提交 待审核'
-            },{
-              id: 2,
-              title: '开会',
-              boardroomId: '第二会议室',
-              useDate: '20180302',
-              useTimeB: '09:00',
-              useTimeE: '12:00',
-              applyDate: '20180201',
-              applicant: '小B',
-              status: '已分配 待提交'
-            }
-          ]
+          data1: []
         }
+      },
+      mounted(){
+        var obj = {
+          page: this.page,
+          limit: this.limit
+        }
+        this.$http.get('Meeting/GetList',{params:obj}).then((res) => {
+          console.log(res);
+          if(res.status === 200 && res.data.data){
+            this.data1 = res.data.data;
+          }else{
+            this.data1 = []
+          }
+        })
       }
     }
 </script>

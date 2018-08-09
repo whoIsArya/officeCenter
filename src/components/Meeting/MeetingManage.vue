@@ -28,6 +28,8 @@
       name: "MeetingManage",
       data(){
         return {
+          page:1,
+          limit: 10,
           columns1: [
             {
               type: 'selection',
@@ -35,23 +37,23 @@
               align: 'center'
             },{
               title: '会议室名称',
-              key: 'name',
+              key: 'Name',
               align: 'center'
             },{
               title: '容量(人)',
-              key: 'capacity',
+              key: 'Capacity',
               align: 'center'
             },{
               title: '地址',
-              key: 'address',
+              key: 'Address',
               align: 'center'
             },{
               title: '配置',
-              key: 'config',
+              key: 'Config',
               align: 'center'
             },{
               title: '操作',
-              key: 'operate',
+              key: 'Operate',
               align: 'center',
               render: (h,params) => {
                 return h('Icon',{
@@ -68,44 +70,31 @@
               }
             }
           ],
-          data1: [
-            {
-              name: '第一会议室',
-              capacity: '200',
-              address: '学堂101',
-              config: '投影'
-            },{
-              name: '第二会议室',
-              capacity: '100',
-              address: '学堂102',
-              config: '投影 电脑'
-            }
-          ]
+          data1: []
         }
       },
       mounted(){
         var obj = {
-          Title: 123,
-          BoardroomId: 456
+          page: this.page,
+          limit: this.limit
         }
-
-          // this.$http({
-          //   method: 'get',
-          //   params: obj,
-          //   // transformRequest:[function () {
-          //   //   return JSON.stringify(obj)
-          //   // }],
-          //   url: 'Meeting/GetList'
-          // }).then((res) => {
-          //   console.log(res)
-          // }).catch((res) => {
-          //   console.log(res);
-          // })
-
-
-          this.$http.post('Meeting/addList',obj).then(function (res) {
-            console.log(res)
-          })
+        this.$http.get('Boardroom/GetList',{params:obj}).then((res) => {
+          console.log(res);
+          if(res.status === 200 && res.data.data){
+            this.data1 = res.data.data;
+          }else{
+            this.data1 = []
+          }
+        })
+        var addObj={
+          Name: '会议室1',
+          Capacity: 10,
+          Address: '林荫大道10号',
+          Config: '电脑 投影'
+        }
+        this.$http.post('Boardroom/AddList',addObj).then((res)=>{
+          console.log(res)
+        })
       }
     }
 </script>
