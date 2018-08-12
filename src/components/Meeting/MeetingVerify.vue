@@ -21,6 +21,28 @@
   .search>div{
     margin-right: 20px;
   }
+  .form-item {
+    margin-bottom: 10px;
+  }
+
+  .form-item > span {
+    width: 100px;
+    display: inline-block;
+    text-align: left;
+  }
+
+  .form-item > b {
+    color: red;
+  }
+  .my-modal p{
+    margin-bottom: 10px;
+    background-color: #53a7ff;
+    padding: 5px 0;
+    color: #fff;
+    border-radius: 3px;
+    padding-left: 10px;
+    box-sizing: border-box;
+  }
 </style>
 <template>
   <div>
@@ -42,120 +64,352 @@
       </div>
       <div>
         <label>使用日期范围：</label>
-        <DatePicker :value="searchDate" format="yyyy/MM/dd" type="daterange" placement="bottom-end" placeholder="选择日期范围" style="width: 200px"></DatePicker>
+        <DatePicker :value="searchDate" @on-change="handleSearchDateChange" :clearable="false" format="yyyy/MM/dd" type="daterange" placement="bottom-end" placeholder="选择日期范围" style="width: 200px"></DatePicker>
       </div>
     </div>
     <div class="oper-group">
-      <Button type="primary">查询</Button>
-      <Button type="primary">清除条件</Button>
+      <Button type="primary" @click="goSearch">查询</Button>
+      <Button type="primary" @click="clearSearch">清除条件</Button>
     </div>
     <Table border :columns="columns1" :data="data1"></Table>
     <div class="pagination">
-      <Page :total="100" show-total show-sizer show-elevator/>
+      <Page :total="total" @on-change="changePage" :current.sync="currentPage" @on-page-size-change="changeLimit" show-total show-sizer show-elevator/>
     </div>
+
+    <Modal v-model="myModal" :title="modalTitle" :mask-closable="false">
+      <div class="my-modal">
+        <div v-if="currentModal === 'verify'">
+          <p>处理部分</p>
+          <div class="form-item">
+            <span>审核结果：</span>
+            <Select v-model="selectRes" style="width:300px">
+              <Option v-for="item in resList" :value="item.value" :key="item.value">{{ item.label }}</Option>
+            </Select>
+          </div>
+          <div class="form-item">
+            <span>审核备注：</span>
+            <Input v-model="inputVerifyMark" type="textarea" :rows="4" style="width: 300px"></Input>
+          </div>
+        </div>
+        <div>
+          <p>申请信息（只读）</p>
+          <div class="form-item">
+            <span>会议标题：</span>
+            <Input v-model="meetingName" :readonly="isReadOnly" :disabled="isDisabled" style="width: 300px"></Input>
+            <b>*</b>
+          </div>
+          <div class="form-item">
+            <span>申请会议室：</span>
+            <Select v-model="selectRoom" :disabled="isDisabled" style="width:300px">
+              <Option v-for="item in roomList" :value="item.value" :key="item.value">{{ item.label }}</Option>
+            </Select>
+            <b>*</b>
+          </div>
+          <div class="form-item">
+            <span>使用日期：</span>
+            <DatePicker @on-change="handleDateChange" :readonly="isReadOnly" :disabled="isDisabled" :value="useDate"
+                        format="yyyy/MM/dd" type="date" placement="bottom-end" style="width: 300px"></DatePicker>
+            <b>*</b>
+          </div>
+          <div class="form-item">
+            <span>使用时间范围：</span>
+            <TimePicker confirm @on-change="handleTimeChange" :readonly="isReadOnly" :disabled="isDisabled"
+                        :value="useTime" format="HH:mm" type="timerange" placement="bottom-end"
+                        style="width: 300px"></TimePicker>
+            <b>*</b>
+          </div>
+          <div class="form-item" v-if="currentModal === 'check'">
+            <span>与会人员：</span>
+            <Input v-model="people" :readonly="isReadOnly" :disabled="isDisabled" style="width: 300px"></Input>
+          </div>
+          <div class="form-item">
+            <span>申请备注：</span>
+            <Input v-model="remark" :readonly="isReadOnly" :disabled="isDisabled" type="textarea" :rows="4"
+                   style="width: 300px"></Input>
+          </div>
+        </div>
+        <div v-if="currentModal === 'check'">
+          <p>处理信息（只读）</p>
+          <div class="form-item">
+            <span>审核结果：</span>
+            <Input v-model="verifyRes" :readonly="isReadOnly" :disabled="isDisabled" style="width: 300px"></Input>
+          </div>
+          <div class="form-item">
+            <span>审核备注：</span>
+            <Input v-model="verifyMark" :readonly="isReadOnly" :disabled="isDisabled" type="textarea" :rows="4"
+                   style="width: 300px"></Input>
+          </div>
+        </div>
+      </div>
+      <div slot="footer">
+        <div v-if="currentModal === 'verify'">
+          <Button type="primary" @click="submitData">审核</Button>
+          <Button type="primary" @click="cancel">返回</Button>
+        </div>
+      </div>
+    </Modal>
+
   </div>
 </template>
 
 <script>
+  import {timestampToDate, timestampToTime} from '@/assets/formateDate'
   export default {
     name: "MeetingVerify",
     data(){
       return {
+        inputVerifyMark:'',
+        selectRes:'',
+        resList:[
+          {
+            value: 1,
+            label: '通过'
+          },{
+            value: 0,
+            label: '未通过'
+          }
+        ],
+        currentPage:1,
+        total:0,
+        page: 1,
+        limit: 10,
+        verifyRes: '',
+        verifyMark: '',
+        isDisabled: false,
+        isReadOnly: false,
+        id: '',
+        people: '',
+        remark: '',
+        useTime: [],
+        useDate: '',
+        selectRoom: '',
+        meetingName: '',
+        currentModal: '',
+        myModal: false,
+        modalTitle: '',
         searchRoom: '',
         searchTitle: '',
         searchPerson: '',
         searchDate: [],
-        roomList: [
-          {
-            value: 1,
-            label: '第一会议室'
-          },{
-            value: 2,
-            label: '第二会议室'
-          }
-        ],
+        roomList: [],
         columns1: [
           {
             title: '序号',
             width: 70,
-            key: 'id',
+            key: 'Id',
             align: 'center'
           },{
             title: '会议标题',
-            key: 'title',
+            key: 'Title',
             align: 'center'
           },{
             title: '会议室',
-            key: 'boardroomId',
+            key: 'BoardroomName',
             align: 'center'
           },{
             title: '使用日期',
-            key: 'useDate',
-            align: 'center'
+            key: 'UseDate',
+            align: 'center',
+            render: (h, params) => {
+              return h('span', timestampToDate(params.row.UseDate))
+            }
           },{
             title: '开始时间',
-            key: 'useTimeB',
-            align: 'center'
+            key: 'UseTimeB',
+            align: 'center',
+            render: (h, params) => {
+              return h('span', timestampToTime(params.row.UseTimeB))
+            }
           },{
             title: '结束时间',
-            key: 'useTimeE',
-            align: 'center'
+            key: 'UseTimeE',
+            align: 'center',
+            render: (h, params) => {
+              return h('span', timestampToTime(params.row.UseTimeE))
+            }
           },{
             title: '申请日期',
-            key: 'applyDate',
-            align: 'center'
+            key: 'ApplyDate',
+            align: 'center',
+            render: (h, params) => {
+              return h('span', timestampToDate(params.row.ApplyDate))
+            }
           },{
             title: '申请人',
-            key: 'applicant',
+            key: 'Applicant',
             align: 'center'
           },{
             title: '状态',
-            key: 'status',
-            align: 'center'
+            key: 'Status',
+            align: 'center',
+            render: (h, params) => {
+              const row = params.row;
+              const text = row.Status === 0 ? '已提交 待审核' : row.Status === 1 ? '已分配' : '已审核';
+              return h('span', {}, text)
+            }
           },{
             title: '操作',
             key: 'operate',
             align: 'center',
             render: (h,params) => {
               const row = params.row;
-              const text = row.id === 1 ? '审核' : '查看';
-              return h('a',{
-                style: {
-                  color: '#2d8cf0'
-                },
-                on: {
-                  click: () => {
+              //row.Status => 0,已提交（审核）  1,已分配（编辑）   2,已审核（查看）
+             if(row.Status === 0){
+               return h('a',{
+                 style: {
+                   color: '#2d8cf0'
+                 },
+                 on: {
+                   click: () => {
+                     this.handleMeeting('verify', row)
+                   }
+                 }
+               },'审核')
+             }else if(row.Status === 2){
+               return h('a',{
+                 style: {
+                   color: '#2d8cf0'
+                 },
+                 on: {
+                   click: () => {
+                     this.handleMeeting('check', row)
+                   }
+                 }
+               },'查看')
+             }
 
-                  }
-                }
-              },text)
             }
           }
         ],
-        data1: [
-          {
-            id: 1,
-            title: '开会',
-            boardroomId: '第一会议室',
-            useDate: '20180302',
-            useTimeB: '09:00',
-            useTimeE: '12:00',
-            applyDate: '20180201',
-            applicant: '小A',
-            status: '已提交 待审核'
-          },{
-            id: 2,
-            title: '开会',
-            boardroomId: '第二会议室',
-            useDate: '20180302',
-            useTimeB: '09:00',
-            useTimeE: '12:00',
-            applyDate: '20180201',
-            applicant: '小B',
-            status: '已审核'
-          }
-        ]
+        data1: [],
+        paramsData:{}
       }
+    },
+    methods:{
+      goSearch: function(){
+        this.paramsData.BoardroomName = this.searchRoom;
+        this.paramsData.Title = this.searchTitle;
+        this.paramsData.Applicant = this.searchPerson;
+        if(!this.searchDate.length){
+          if(this.paramsData.hasOwnProperty("UseTimeB") || this.paramsData.hasOwnProperty("UseTimeE")){
+            delete this.paramsData["UseTimeB"];
+            delete this.paramsData["UseTimeE"];
+          }
+        } else{
+          this.paramsData.UseTimeB = new Date(this.searchDate[0]).getTime();
+          this.paramsData.UseTimeE = new Date(this.searchDate[1]).getTime();
+        }
+        this.page = 1;
+        this.currentPage = 1;
+        this.getData();
+      },
+      clearSearch: function(){
+        this.searchRoom = '';
+        this.searchDate = [];
+        this.searchTitle = '';
+        this.searchPerson = '';
+      },
+      handleDateChange: function (date) {
+        this.useDate = date;
+      },
+      handleSearchDateChange: function(date){
+        this.searchDate = date;
+      },
+      handleTimeChange: function (time) {
+        this.useTime = time;
+      },
+      changePage: function (page) {
+        this.page = page;
+        this.getData();
+      },
+      changeLimit: function (limit) {
+        this.limit = limit;
+        this.getData();
+      },
+      cancel: function () {
+        this.myModal = false;
+      },
+      getSeconds: function (time) {
+        let arr = time.split(":");
+        return parseInt(arr[0]) * 3600 + parseInt(arr[1]) * 60;
+      },
+      handleMeeting: function (str, row) {
+        this.currentModal = str;
+        this.myModal = true;
+        this.modalTitle = str === 'verify' ? '会议申请-审核' : '会议申请-查看';
+        this.isReadOnly = true;
+        this.isDisabled = true;
+        if (row) {
+          this.id = row.Id;
+          this.meetingName = row.Title;
+          this.selectRoom = row.BoardroomName;
+          this.useDate = timestampToDate(row.UseDate);
+          this.useTime = [timestampToTime(row.UseTimeB), timestampToTime(row.UseTimeE)];
+          this.people = row.Participants;
+          this.remark = row.ApplyRemarks;
+          let filterArr = this.data1.filter(function (item) {
+            return item.Id === row.Id
+          });
+          if(filterArr && filterArr.length){
+            this.verifyRes = filterArr[0].ReviewRes === 0 ? '失败' : '成功';
+            this.verifyMark = filterArr[0].ReviewRemarks;
+          }
+        }
+      },
+      submitData: function () {
+        let self = this;
+        if(this.currentModal === 'verify'){
+          let filterArr = this.data1.filter(function (item) {
+            return item.Id === self.id
+          });
+          if(filterArr && filterArr.length){
+            filterArr[0].ReviewRes = this.selectRes;
+            filterArr[0].ReviewRemarks = this.inputVerifyMark;
+            filterArr[0].Status = 2;
+          }
+
+          this.$http.post('Meeting/UpdList', filterArr).then((res) => {
+            if (res.status === 200 && res.data > 0) {
+              this.$Message.success('审核成功');
+            } else {
+              this.$Message.error('审核失败')
+            }
+            this.myModal = false;
+            this.getData();
+          })
+
+        }
+      },
+      getData: function () {
+        this.paramsData.page = this.page;
+        this.paramsData.limit = this.limit;
+        this.$http.get('Meeting/GetList', {params: this.paramsData}).then((res) => {
+          if (res.status === 200 && res.data.data) {
+            this.data1 = res.data.data;
+            this.total = res.data.count;
+          } else {
+            this.data1 = []
+          }
+        })
+      },
+    },
+    mounted(){
+      let obj = {
+        page: 1,
+        limit: 1000
+      };
+      this.$http.get('Boardroom/GetList', {params: obj}).then((res) => {
+        if (res.status === 200 && res.data.data) {
+          this.roomList = res.data.data.map(function (item) {
+            let obj = {
+              label: item.Name,
+              value: item.Name
+            };
+            return obj;
+          });
+        }
+      });
+      this.getData();
     }
   }
 </script>
