@@ -121,8 +121,13 @@
           }
         ]
       }
+    },
+    mounted(){
+      this.$http.get('Boardroom/GetAWkplan').then(function (res) {
+        console.log(res)
+      })
     }
-  }
+  }productionSourceMap
 </script>
 
 

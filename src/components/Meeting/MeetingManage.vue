@@ -196,10 +196,10 @@
             this.$http.post('Boardroom/DelList',newIdArr).then((res)=>{
               if(res.status === 200 && res.data > 0){
                 this.$Message.success('删除成功');
-                this.selectArr = [];
               }else{
                 this.$Message.error('删除失败');
               }
+              this.selectArr = [];
               this.myModal = false;
               this.getData();
             })
