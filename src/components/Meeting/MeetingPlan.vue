@@ -42,9 +42,6 @@
       <Button type="primary">清除条件</Button>
     </div>
     <Table border :columns="columns1" :data="data1"></Table>
-    <div class="pagination">
-      <Page :total="100" show-total show-sizer show-elevator/>
-    </div>
   </div>
 </template>
 
@@ -55,15 +52,7 @@
       return {
         searchRoom: '',
         searchDate: '',
-        roomList: [
-          {
-            value: 1,
-            label: '第一会议室'
-          },{
-            value: 2,
-            label: '第二会议室'
-          }
-        ],
+        roomList: [],
         columns1: [
           {
             title: '会议室',
@@ -123,7 +112,23 @@
       }
     },
     mounted(){
-      this.$http.get('Boardroom/GetAWkplan').then(function (res) {
+      let obj = {
+        page: 1,
+        limit: 1000
+      };
+      this.$http.get('Boardroom/GetList', {params: obj}).then((res) => {
+        if (res.status === 200 && res.data.data) {
+          this.roomList = res.data.data.map(function (item) {
+            let obj = {
+              label: item.Name,
+              value: item.Name
+            };
+            return obj;
+          });
+        }
+      });
+
+      this.$http.get('Boardroom/GetAWkplan?UseDate=2018-08-06').then(function (res) {
         console.log(res)
       })
     }

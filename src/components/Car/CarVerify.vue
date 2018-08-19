@@ -21,6 +21,39 @@
   .search>div{
     margin-right: 20px;
   }
+  .row-form {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .row-form > div {
+    margin-bottom: 10px;
+  }
+
+  .row-form > div span {
+    width: 60px;
+    display: inline-block;
+  }
+
+  .form-item {
+    margin-bottom: 10px;
+  }
+
+  .form-item > span {
+    width: 100px;
+    display: inline-block;
+    text-align: left;
+  }
+  .my-modal p{
+    margin-bottom: 10px;
+    background-color: #53a7ff;
+    padding: 5px 0;
+    color: #fff;
+    border-radius: 3px;
+    padding-left: 10px;
+    box-sizing: border-box;
+  }
 </style>
 <template>
   <div>
@@ -28,93 +61,329 @@
       <div class="tip">查询条件</div>
       <div>
         <label>使用日期范围：</label>
-        <DatePicker :value="searchDate" format="yyyy/MM/dd" type="daterange" placement="bottom-end" placeholder="选择日期范围" style="width: 200px"></DatePicker>
+        <DatePicker :value="searchDate" @on-change="handleDateChange" :clearable="false"  format="yyyy/MM/dd" type="daterange" placement="bottom-end" placeholder="选择日期范围" style="width: 200px"></DatePicker>
       </div>
     </div>
     <div class="oper-group">
-      <Button type="primary">查询</Button>
-      <Button type="primary">清除条件</Button>
+      <Button type="primary" @click="goSearch">查询</Button>
+      <Button type="primary" @click="cancelSearch">清除条件</Button>
     </div>
-    <Table border :columns="columns1" :data="data1"></Table>
+    <Table border @on-selection-change="selectRow" :columns="columns1" :data="data1"></Table>
+
     <div class="pagination">
-      <Page :total="100" show-total show-sizer show-elevator/>
+      <Page :total="total" @on-change="changePage" :current.sync="currentPage" @on-page-size-change="changeLimit" show-total show-sizer show-elevator/>
     </div>
+
+    <Modal v-model="myModal" :title="modalTitle" :mask-closable="false">
+      <div class="my-modal"  v-if="currentModal !== 'del'">
+        <div  v-if="currentModal === 'check'">
+          <p>申请信息（只读）</p>
+        </div>
+        <div class="row-form">
+          <div>
+            <span>使用日期：</span>
+            <DatePicker @on-change="useDateChange" :value="carUseDate" :disabled="isDisabled" format="yyyy/MM/dd" type="date" placement="bottom-end" style="width: 160px"></DatePicker>
+          </div>
+          <div>
+            <span>出车地点：</span>
+            <Input v-model="carAddress" :disabled="isDisabled" style="width: 160px"></Input>
+          </div>
+        </div>
+
+        <div class="row-form">
+          <div>
+            <span>目的地点：</span>
+            <Input v-model="carAim" :disabled="isDisabled" style="width: 160px"></Input>
+          </div>
+          <div>
+            <span>用车人：</span>
+            <Input v-model="carUsePerson" :disabled="isDisabled" style="width: 160px"></Input>
+          </div>
+        </div>
+
+        <div class="row-form">
+          <div>
+            <span>人数：</span>
+            <Input v-model="carPeopleNum" :disabled="isDisabled" style="width: 160px"></Input>
+          </div>
+          <div>
+            <span>事由：</span>
+            <Input v-model="carReason" :disabled="isDisabled" style="width: 160px"></Input>
+          </div>
+        </div>
+
+        <div class="row-form">
+          <div style="width: 100%">
+            <span style="width: 84px">使用时间范围：</span>
+            <TimePicker confirm @on-change="useTimeChange" :value="useTimeRange" format="HH:mm" type="timerange" placement="bottom-end" :disabled="isDisabled" style="width: 82%"></TimePicker>
+          </div>
+        </div>
+
+        <div>
+          <div>
+            <span>申请备注：</span>
+            <Input v-model="remarks" :disabled="isDisabled" type="textarea" :rows="4" style="width: 87%"></Input>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="my-modal" v-if="currentModal === 'check'">
+        <p style="margin-top: 10px;">处理信息（只读）</p>
+        <div class="row-form">
+          <div>
+            <span>审核结果：</span>
+            <Input v-model="verifyRes" :disabled="true" style="width: 160px"></Input>
+          </div>
+          <div>
+            <span>审核备注：</span>
+            <Input v-model="verifyMark" :disabled="true" type="textarea" :rows="4" style="width: 160px"></Input>
+          </div>
+        </div>
+
+        <p>安排信息（只读）</p>
+        <div class="row-form">
+          <div>
+            <span>车辆：</span>
+            <Input v-model="checkCar" :disabled="true" style="width: 160px"></Input>
+          </div>
+          <div>
+            <span>安排司机：</span>
+            <Input v-model="checkDriver" :disabled="true" style="width: 160px"></Input>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="my-modal" v-if="currentModal === 'verify'">
+        <p style="margin-top: 10px;">处理信息</p>
+        <div>
+          <div class="form-item">
+            <span>审核结果：</span>
+            <Select v-model="selectVerifyRes" style="width:300px">
+              <Option v-for="item in resList" :value="item.value" :key="item.value">{{ item.label }}</Option>
+            </Select>
+          </div>
+          <div class="form-item">
+            <span>审核备注：</span>
+            <Input v-model="inputVerifyMark" type="textarea" :rows="4" style="width: 300px"></Input>
+          </div>
+        </div>
+
+      </div>
+
+      <div v-if="currentModal === 'del'">
+        <div>确定删除该条数据？</div>
+      </div>
+      <div slot="footer">
+        <div v-if="currentModal !== 'check'">
+          <Button type="primary" @click="submit">{{currentModal === 'del' ? '确定' :currentModal === 'verify'? '审核' : '保存'}}</Button>
+          <Button type="primary" @click="cancel">返回</Button>
+        </div>
+      </div>
+    </Modal>
   </div>
 </template>
 
 <script>
+  import {timestampToDate, timestampToTime} from '@/assets/formateDate'
   export default {
     name: "CarVerify",
     data(){
       return {
+        //表单
+        carUseDate: '',
+        carAddress: '',
+        carAim: '',
+        carUsePerson: '',
+        carPeopleNum: '',
+        carReason: '',
+        remarks: '',
+        useTimeRange:[],
+        isDisabled: false,
+        verifyRes:'',
+        verifyMark:'',
+        checkCar:'',
+        checkDriver:'',
+        resList:[
+          {
+            value: 1,
+            label: '通过'
+          },{
+            value: 0,
+            label: '未通过'
+          }
+        ],
+        selectVerifyRes:'',
+        inputVerifyMark:'',
+
+        //分页
+        total: 0,
+        limit: 10,
+        page: 1,
+        currentPage: 1,
+
+        //搜索
         searchDate: [],
+
+        //弹窗
+        myModal: false,
+        modalTitle: '',
+
+        //表格
+        selectArr:[],
+        id:'',
+        currentModal: '',
+        paramsData: {},
         columns1: [
           {
-            title: '序号',
-            key: 'id',
-            align: 'center'
-          },
-          {
             title: '使用日期',
-            key: 'useDate',
-            align: 'center'
+            key: 'UseDate',
+            align: 'center',
+            render: (h, params) => {
+              return h('span', timestampToDate(params.row.UseDate))
+            }
           },{
             title: '开始时间',
-            key: 'useTimeB',
-            align: 'center'
+            key: 'UseTimeB',
+            align: 'center',
+            render: (h, params) => {
+              return h('span', timestampToTime(params.row.UseTimeB))
+            }
           },{
             title: '结束时间',
-            key: 'useTimeE',
-            align: 'center'
+            key: 'UseTimeE',
+            align: 'center',
+            render: (h, params) => {
+              return h('span', timestampToTime(params.row.UseTimeE))
+            }
           },{
             title: '出车地点',
-            key: 'startingPlace',
+            key: 'StartingPlace',
             align: 'center'
           },{
             title: '目的地点',
-            key: 'startingPlace',
+            key: 'StartingPlace',
             align: 'center'
           },{
             title: '人数',
-            key: 'popNumber',
+            key: 'POPNumber',
             align: 'center'
           },{
             title: '用车人',
-            key: 'user',
+            key: 'User',
             align: 'center'
           },{
             title: '申请人',
-            key: 'applicant',
+            key: 'Applicant',
             align: 'center'
           },{
             title: '操作步骤',
-            key: 'status',
-            align: 'center'
+            key: 'Status',
+            align: 'center',
+            render: (h,params)=>{
+              const row = params.row;
+              var text;
+              switch (row.Status){
+                case 0:
+                  text = '已提交 待审核';
+                  break;
+                case 1:
+                  text = '已分配 待提交';
+                  break;
+                case 2:
+                  text = '已审核 待分配';
+                  break;
+                case 3:
+                  text = '未通过审核';
+                  break;
+                case 4:
+                  text = '已安排';
+                  break;
+                case 5:
+                  text = '车辆归还';
+                  break;
+              }
+              return h('span',text)
+            }
           },{
             title: '操作',
             key: 'operate',
+            width: 180,
             align: 'center',
             render: (h,params) => {
+              // 0 已提交 1 已分配 2 已审核  3 未通过审核 4 已安排 5 车辆归还
               const row = params.row;
-              if(row.status.indexOf('待审核') !== -1){
+              if(row.Status === 0){
                 return h('a',{
                   style: {
                     color: '#2d8cf0'
                   },
                   on: {
                     click: () => {
-
+                      this.handleCarApply('verify',row)
                     }
                   }
                 },'审核')
+              }else if(row.Status === 1){
+                return h('div',[
+                  h('Icon', {
+                    props: {
+                      type: 'compose',
+                      size: 20
+                    },
+                    style:{
+                      marginRight:'5px'
+                    },
+                    nativeOn: {
+                      click: () => {
+                        this.handleCarApply('edit',row)
+                      }
+                    }
+                  }),
+                  h('a',{
+                    style: {
+                      color: '#2d8cf0'
+                    },
+                    on: {
+                      click: () => {
+                        this.handleCarApply('del',row)
+                      }
+                    }
+                  },'删除')
+                ])
+              }else if(row.Status === 4){
+                return h('div',[
+                  h('a',{
+                    style: {
+                      color: '#2d8cf0',
+                      marginRight: '5px'
+                    },
+                    on: {
+                      click: () => {
+                        this.changeStatus(row)
+                      }
+                    }
+                  },'用车归还'),
+                  h('a',{
+                    style: {
+                      color: '#2d8cf0'
+                    },
+                    on: {
+                      click: () => {
+                        this.handleCarApply('check',row)
+                      }
+                    }
+                  },'查看')
+                ])
               }else{
-                return  h('a',{
+                return h('a',{
                   style: {
                     color: '#2d8cf0'
                   },
                   on: {
                     click: () => {
-
+                      this.handleCarApply('check',row)
                     }
                   }
                 },'查看')
@@ -122,47 +391,179 @@
             }
           }
         ],
-        data1: [
-          {
-            id: 1,
-            useDate: 20180203,
-            useTimeB: '08:00',
-            useTimeE: '12:00',
-            startingPlace: '学校',
-            destination: '教育局',
-            popNumber: '4',
-            user: '000018',
-            applicant: '小A',
-            status: '未通过审核'
-          },{
-            id: 2,
-            useDate: 20180203,
-            useTimeB: '08:00',
-            useTimeE: '12:00',
-            startingPlace: '学校',
-            destination: '教育局',
-            popNumber: '4',
-            user: '000018',
-            applicant: '小A',
-            status: '已审核 待分配'
-          },{
-            id: 3,
-            useDate: 20180203,
-            useTimeB: '08:00',
-            useTimeE: '12:00',
-            startingPlace: '学校',
-            destination: '教育局',
-            popNumber: '4',
-            user: '000018',
-            applicant: '小A',
-            status: '已提交 待审核'
-          }
-        ]
+        data1: []
       }
+    },
+    methods: {
+      //表格操作
+      changeStatus: function(row){
+        this.id = row.Id;
+        let paramObj = {
+          Id: this.id,
+          Status: 5
+        };
+        this.$http.post('Drawout/UpdList',paramObj).then((res)=>{
+          if(res.status === 200 && res.data>0){
+            this.$Message.success('归还成功');
+          }else{
+            this.$Message.error('归还失败');
+          }
+          this.getData();
+        })
+      },
+      handleCarApply: function(str,row){
+        this.currentModal = str;
+        this.myModal = true;
+        this.modalTitle = str === 'add' ? '车辆申请-增加' : str === 'check' ? '车辆申请-查看': str === 'del'? '车辆申请-删除': str === 'verify' ? '车辆申请-审核': '车辆申请-编辑';
+        if(row){
+          this.id = row.Id;
+          this.carUseDate = timestampToDate(row.UseDate);
+          this.useTimeRange = [timestampToTime(row.UseTimeB),timestampToTime(row.UseTimeE)];
+          this.carAddress = row.StartingPlace;
+          this.carAim = row.Destination;
+          this.carPeopleNum = row.POPNumber;
+          this.carUsePerson = row.User;
+          this.carReason = row.Reason;
+          this.remarks = row.ApplyRemarks;
+          this.verifyRes = row.ReviewRes === 0 ? '未通过' : '通过';
+          this.verifyMark = row.ReviewRemarks;
+          this.checkCar = row.CarName;
+          this.checkDriver = row.DriverId;
+        }
+
+        this.isDisabled = str === 'check' || str === 'verify';
+
+      },
+      submit: function(){
+        let obj = {
+          UseDate: new Date(this.carUseDate).getTime(),
+          UseTimeB	: this.getSeconds(this.useTimeRange[0]),
+          UseTimeE	: this.getSeconds(this.useTimeRange[1]),
+          StartingPlace	: this.carAddress,
+          Destination	: this.carAim,
+          POPNumber	: Number(this.carPeopleNum),
+          User	: this.carUsePerson,
+          Reason	:this.carReason,
+          ApplyRemarks	:this.remarks
+        };
+        if(this.currentModal === 'add'){
+          obj.Status = 1;
+          this.$http.post('Drawout/AddList',obj).then((res)=>{
+            if(res.status === 200 && res.data>0){
+              this.$Message.success('增加成功');
+            }else{
+              this.$Message.error('增加失败');
+            }
+            this.myModal = false;
+            this.getData();
+          })
+        }
+        if(this.currentModal === 'verify'){
+         let paramObj = {
+           Id: this.id,
+           ReviewRes: this.selectVerifyRes,
+           ReviewRemarks: this.inputVerifyMark,
+           Status:2
+         }
+          this.$http.post('Drawout/UpdList',paramObj).then((res)=>{
+            if(res.status === 200 && res.data>0){
+              this.$Message.success('审核成功');
+            }else{
+              this.$Message.error('审核失败');
+            }
+            this.getData();
+            this.myModal = false;
+          })
+        }
+        if(this.currentModal === 'del'){
+          let data = [this.id];
+          this.$http.post('Drawout/DelList',data).then((res)=>{
+            if(res.status === 200 && res.data>0){
+              this.$Message.success('删除成功');
+            }else{
+              this.$Message.error('删除失败');
+            }
+            this.getData();
+            this.myModal = false;
+          })
+        }
+        if(this.currentModal === 'edit'){
+          obj.Id = this.id;
+          this.$http.post('Drawout/UpdList',obj).then((res)=>{
+            if(res.status === 200 && res.data>0){
+              this.$Message.success('修改成功');
+            }else{
+              this.$Message.error('修改失败');
+            }
+            this.getData();
+            this.myModal = false;
+          })
+        }
+      },
+      cancel:function(){
+        this.myModal = false;
+      },
+      selectRow: function (select) {
+        this.selectArr = select;
+      },
+      useDateChange:function(date){
+        this.carUseDate = date;
+      },
+      useTimeChange:function(time){
+        this.useTimeRange = time;
+      },
+      getSeconds: function (time) {
+        let arr = time.split(":");
+        return parseInt(arr[0]) * 3600 + parseInt(arr[1]) * 60;
+      },
+      //  搜索
+      goSearch: function () {
+        if(!this.searchDate.length){
+          if(this.paramsData.hasOwnProperty("UseDateB") || this.paramsData.hasOwnProperty("UseDateE")){
+            delete this.paramsData["UseDateB"];
+            delete this.paramsData["UseDateE"];
+          }
+        } else{
+          this.paramsData.UseDateB = new Date(this.searchDate[0]).getTime();
+          this.paramsData.UseDateE = new Date(this.searchDate[1]).getTime();
+        }
+        this.page = 1;
+        this.currentPage =1;
+        this.getData();
+      },
+      cancelSearch: function () {
+        this.searchDate = []
+      },
+      handleDateChange: function(date){
+        this.searchDate = date;
+      },
+
+      //  分页
+      changePage: function (page) {
+        this.page = page;
+        this.getData();
+      },
+      changeLimit: function (limit) {
+        this.limit = limit;
+        this.getData();
+      },
+
+      getData: function () {
+        this.paramsData.page = this.page;
+        this.paramsData.limit = this.limit;
+        this.$http.get('Drawout/GetList',{params: this.paramsData}).then((res)=>{
+          if(res.status === 200 && res.data.data){
+            this.data1 = res.data.data;
+            this.total = res.data.count;
+          }
+        })
+      }
+    },
+    mounted(){
+      this.getData();
     }
   }
 </script>
-
 
 
 

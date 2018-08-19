@@ -376,7 +376,7 @@
           this.selectArr.forEach(function (item) {
             item.Status = 0;
           });
-          this.$http.post('Meeting/UpdList', this.selectArr).then((res) => {
+          this.$http.post('Meeting/UpdListStu', this.selectArr).then((res) => {
             if (res.status === 200 && res.data > 0) {
               this.$Message.success('提交成功');
             } else {
