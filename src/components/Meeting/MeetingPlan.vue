@@ -1,4 +1,4 @@
-<style scoped>
+<style>
   .oper-group{
     width: 100%;
     text-align: right;
@@ -21,6 +21,18 @@
   .search>div{
     margin-right: 20px;
   }
+  .table-one>.ivu-table> .ivu-table-tip{
+    display: none;
+  }
+  .table-one>.ivu-table:before{
+    display: none;
+  }
+  .table-one>.ivu-table th{
+    border-bottom: none;
+  }
+  .table-one+.ivu-table-wrapper>.ivu-table th{
+    background-color: #fff;
+  }
 </style>
 <template>
   <div>
@@ -34,18 +46,20 @@
       </div>
       <div>
         <label>起始日期：</label>
-        <DatePicker :value="searchDate" format="yyyy/MM/dd" type="date" placement="bottom-end" placeholder="选择日期范围" style="width: 200px"></DatePicker>
+        <DatePicker :value="searchDate" @on-change="handleDateChange" format="yyyy/MM/dd" type="date" placement="bottom-end" placeholder="选择日期范围" style="width: 200px"></DatePicker>
       </div>
     </div>
     <div class="oper-group">
-      <Button type="primary">查询</Button>
-      <Button type="primary">清除条件</Button>
+      <Button type="primary" @click="goSearch">查询</Button>
+      <Button type="primary" @click="cancelSearch">清除条件</Button>
     </div>
-    <Table border :columns="columns1" :data="data1"></Table>
+    <Table border class="table-one" :columns="columns1" :data="data1"></Table>
+    <Table border :columns="columns2" :data="data2"></Table>
   </div>
 </template>
 
 <script>
+  import {timestampToDate, timestampToTime} from '@/assets/formateDate'
   export default {
     name: "MeetingPlan",
     data(){
@@ -88,27 +102,112 @@
             align: 'center'
           }
         ],
-        data1: [
+        columns2:[],
+        columnsData2: [
           {
-            id: '',
-            one: '2018年7月30日',
-            two: '2018年7月31日',
-            three: '2018年8月1日',
-            four: '2018年8月2日',
-            five: '2018年8月3日',
-            six: '2018年8月4日',
-            seven: '2018年8月5日'
+            title:' ',
+            key: 'name'
+          },
+          {
+            title: timestampToDate(new Date().getTime(),true),
+            key: timestampToDate(new Date().getTime(),true),
+            align: 'center'
           },{
-            id: '第一会议室',
-            one: '',
-            two: '',
-            three: '',
-            four: '',
-            five: '',
-            six: '',
-            seven: ''
+            title: timestampToDate(new Date().getTime() + 24*60*60*1000,true),
+            key: timestampToDate(new Date().getTime() + 24*60*60*1000,true),
+            align: 'center'
+          },{
+            title: timestampToDate(new Date().getTime() + 48*60*60*1000,true),
+            key: timestampToDate(new Date().getTime() + 48*60*60*1000,true),
+            align: 'center'
+          },{
+            title: timestampToDate(new Date().getTime() + 72*60*60*1000,true),
+            key: timestampToDate(new Date().getTime() + 72*60*60*1000,true),
+            align: 'center'
+          },{
+            title: timestampToDate(new Date().getTime() + 96*60*60*1000,true),
+            key: timestampToDate(new Date().getTime() + 96*60*60*1000,true),
+            align: 'center'
+          },{
+            title: timestampToDate(new Date().getTime() + 120*60*60*1000,true),
+            key: timestampToDate(new Date().getTime() + 120*60*60*1000,true),
+            align: 'center'
+          },{
+            title: timestampToDate(new Date().getTime() + 144*60*60*1000,true),
+            key: timestampToDate(new Date().getTime() + 144*60*60*1000,true),
+            align: 'center'
           }
-        ]
+        ],
+        data1: [],
+        data2: [],
+        paramsObj:{}
+      }
+    },
+    methods:{
+      handleDateChange:function (date) {
+        this.searchDate = date;
+      },
+      cancelSearch:function(){
+        this.searchDate = '';
+        this.searchRoom = '';
+      },
+      goSearch:function () {
+        if(this.searchDate){
+          this.columns2 = [
+            {
+              title:' ',
+              key: 'name'
+            },
+            {
+              title: timestampToDate(new Date(this.searchDate).getTime(),true),
+              key: timestampToDate(new Date(this.searchDate).getTime(),true),
+              align: 'center'
+            },{
+              title: timestampToDate(new Date(this.searchDate).getTime() + 24*60*60*1000,true),
+              key: timestampToDate(new Date(this.searchDate).getTime() + 24*60*60*1000,true),
+              align: 'center'
+            },{
+              title: timestampToDate(new Date(this.searchDate).getTime() + 48*60*60*1000,true),
+              key: timestampToDate(new Date(this.searchDate).getTime() + 48*60*60*1000,true),
+              align: 'center'
+            },{
+              title: timestampToDate(new Date(this.searchDate).getTime() + 72*60*60*1000,true),
+              key: timestampToDate(new Date(this.searchDate).getTime() + 72*60*60*1000,true),
+              align: 'center'
+            },{
+              title: timestampToDate(new Date(this.searchDate).getTime() + 96*60*60*1000,true),
+              key: timestampToDate(new Date(this.searchDate).getTime() + 96*60*60*1000,true),
+              align: 'center'
+            },{
+              title: timestampToDate(new Date(this.searchDate).getTime() + 120*60*60*1000,true),
+              key: timestampToDate(new Date(this.searchDate).getTime() + 120*60*60*1000,true),
+              align: 'center'
+            },{
+              title: timestampToDate(new Date(this.searchDate).getTime() + 144*60*60*1000,true),
+              key: timestampToDate(new Date(this.searchDate).getTime() + 144*60*60*1000,true),
+              align: 'center'
+            }
+          ]
+        }else{
+          this.columns2 = this.columnsData2;
+        }
+        this.paramsObj.UseDate = this.searchDate ? timestampToDate(new Date(this.searchDate).getTime(),true) : timestampToDate(new Date().getTime(),true);
+        this.paramsObj.BoardroomName = this.searchRoom;
+        this.data2 = [];
+        this.getData();
+      },
+      getData:function () {
+        this.$http.get('Boardroom/GetAWkplan',{params:this.paramsObj}).then( (res) => {
+          if(res.status === 200 && res.data && res.data.data){
+            let dataObj={};
+            dataObj.name = res.data.boardroomname;
+            res.data.data.forEach(function (item) {
+              dataObj[item.usedate] = item.title;
+            });
+            console.log('dataobj',dataObj);
+            this.data2 = [dataObj];
+          }
+        })
       }
     },
     mounted(){
@@ -127,10 +226,7 @@
           });
         }
       });
-
-      this.$http.get('Boardroom/GetAWkplan?UseDate=2018-08-06').then(function (res) {
-        console.log(res)
-      })
+      this.columns2 = this.columnsData2;
     }
   }
 </script>
