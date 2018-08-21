@@ -8,6 +8,9 @@ import routerConfig from './router/index.js'
 import axios from 'axios'
 import iView from 'iview'
 import 'iview/dist/styles/iview.css';
+import 'quill/dist/quill.core.css';
+import 'quill/dist/quill.snow.css';
+import 'quill/dist/quill.bubble.css';
 
 Vue.use(Router);
 Vue.use(iView);
