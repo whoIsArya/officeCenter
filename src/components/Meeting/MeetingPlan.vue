@@ -109,32 +109,32 @@
             key: 'name'
           },
           {
-            title: timestampToDate(new Date().getTime(),true),
-            key: timestampToDate(new Date().getTime(),true),
+            title: timestampToDate(new Date().getTime(),'-'),
+            key: timestampToDate(new Date().getTime(),'-'),
             align: 'center'
           },{
-            title: timestampToDate(new Date().getTime() + 24*60*60*1000,true),
-            key: timestampToDate(new Date().getTime() + 24*60*60*1000,true),
+            title: timestampToDate(new Date().getTime() + 24*60*60*1000,'-'),
+            key: timestampToDate(new Date().getTime() + 24*60*60*1000,'-'),
             align: 'center'
           },{
-            title: timestampToDate(new Date().getTime() + 48*60*60*1000,true),
-            key: timestampToDate(new Date().getTime() + 48*60*60*1000,true),
+            title: timestampToDate(new Date().getTime() + 48*60*60*1000,'-'),
+            key: timestampToDate(new Date().getTime() + 48*60*60*1000,'-'),
             align: 'center'
           },{
-            title: timestampToDate(new Date().getTime() + 72*60*60*1000,true),
-            key: timestampToDate(new Date().getTime() + 72*60*60*1000,true),
+            title: timestampToDate(new Date().getTime() + 72*60*60*1000,'-'),
+            key: timestampToDate(new Date().getTime() + 72*60*60*1000,'-'),
             align: 'center'
           },{
-            title: timestampToDate(new Date().getTime() + 96*60*60*1000,true),
-            key: timestampToDate(new Date().getTime() + 96*60*60*1000,true),
+            title: timestampToDate(new Date().getTime() + 96*60*60*1000,'-'),
+            key: timestampToDate(new Date().getTime() + 96*60*60*1000,'-'),
             align: 'center'
           },{
-            title: timestampToDate(new Date().getTime() + 120*60*60*1000,true),
-            key: timestampToDate(new Date().getTime() + 120*60*60*1000,true),
+            title: timestampToDate(new Date().getTime() + 120*60*60*1000,'-'),
+            key: timestampToDate(new Date().getTime() + 120*60*60*1000,'-'),
             align: 'center'
           },{
-            title: timestampToDate(new Date().getTime() + 144*60*60*1000,true),
-            key: timestampToDate(new Date().getTime() + 144*60*60*1000,true),
+            title: timestampToDate(new Date().getTime() + 144*60*60*1000,'-'),
+            key: timestampToDate(new Date().getTime() + 144*60*60*1000,'-'),
             align: 'center'
           }
         ],
@@ -159,39 +159,39 @@
               key: 'name'
             },
             {
-              title: timestampToDate(new Date(this.searchDate).getTime(),true),
-              key: timestampToDate(new Date(this.searchDate).getTime(),true),
+              title: timestampToDate(new Date(this.searchDate).getTime(),'-'),
+              key: timestampToDate(new Date(this.searchDate).getTime(),'-'),
               align: 'center'
             },{
-              title: timestampToDate(new Date(this.searchDate).getTime() + 24*60*60*1000,true),
-              key: timestampToDate(new Date(this.searchDate).getTime() + 24*60*60*1000,true),
+              title: timestampToDate(new Date(this.searchDate).getTime() + 24*60*60*1000,'-'),
+              key: timestampToDate(new Date(this.searchDate).getTime() + 24*60*60*1000,'-'),
               align: 'center'
             },{
-              title: timestampToDate(new Date(this.searchDate).getTime() + 48*60*60*1000,true),
-              key: timestampToDate(new Date(this.searchDate).getTime() + 48*60*60*1000,true),
+              title: timestampToDate(new Date(this.searchDate).getTime() + 48*60*60*1000,'-'),
+              key: timestampToDate(new Date(this.searchDate).getTime() + 48*60*60*1000,'-'),
               align: 'center'
             },{
-              title: timestampToDate(new Date(this.searchDate).getTime() + 72*60*60*1000,true),
-              key: timestampToDate(new Date(this.searchDate).getTime() + 72*60*60*1000,true),
+              title: timestampToDate(new Date(this.searchDate).getTime() + 72*60*60*1000,'-'),
+              key: timestampToDate(new Date(this.searchDate).getTime() + 72*60*60*1000,'-'),
               align: 'center'
             },{
-              title: timestampToDate(new Date(this.searchDate).getTime() + 96*60*60*1000,true),
-              key: timestampToDate(new Date(this.searchDate).getTime() + 96*60*60*1000,true),
+              title: timestampToDate(new Date(this.searchDate).getTime() + 96*60*60*1000,'-'),
+              key: timestampToDate(new Date(this.searchDate).getTime() + 96*60*60*1000,'-'),
               align: 'center'
             },{
-              title: timestampToDate(new Date(this.searchDate).getTime() + 120*60*60*1000,true),
-              key: timestampToDate(new Date(this.searchDate).getTime() + 120*60*60*1000,true),
+              title: timestampToDate(new Date(this.searchDate).getTime() + 120*60*60*1000,'-'),
+              key: timestampToDate(new Date(this.searchDate).getTime() + 120*60*60*1000,'-'),
               align: 'center'
             },{
-              title: timestampToDate(new Date(this.searchDate).getTime() + 144*60*60*1000,true),
-              key: timestampToDate(new Date(this.searchDate).getTime() + 144*60*60*1000,true),
+              title: timestampToDate(new Date(this.searchDate).getTime() + 144*60*60*1000,'-'),
+              key: timestampToDate(new Date(this.searchDate).getTime() + 144*60*60*1000,'-'),
               align: 'center'
             }
           ]
         }else{
           this.columns2 = this.columnsData2;
         }
-        this.paramsObj.UseDate = this.searchDate ? timestampToDate(new Date(this.searchDate).getTime(),true) : timestampToDate(new Date().getTime(),true);
+        this.paramsObj.UseDate = this.searchDate ? timestampToDate(new Date(this.searchDate).getTime(),'-') : timestampToDate(new Date().getTime(),'-');
         this.paramsObj.BoardroomName = this.searchRoom;
         this.data2 = [];
         this.getData();
