@@ -7,8 +7,7 @@
         name: "ActivityEdit",
         mounted(){
           let obj={
-            DateB: new Date('2018/8/1').getTime(),
-            DateE: new Date('2018/8/30').getTime()
+            DateB: 1533052800
           }
           this.$http.get('Event/GetList',{params:obj}).then()
         }

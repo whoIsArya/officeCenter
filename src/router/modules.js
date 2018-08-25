@@ -8,6 +8,7 @@ import Email from '@/components/Email/Email';
 import Person from '@/components/Person/Person';
 import Activity from '@/components/Activity/Activity';
 import Schedule from '@/components/Schedule/Schedule';
+import Document from '@/components/Document/Document';
 import meetingModule from '@/router/meeting';
 import carModule from '@/router/car';
 import newsModule from '@/router/news';
@@ -18,6 +19,7 @@ import emailModule from '@/router/email';
 import personModule from '@/router/person';
 import activityModule from '@/router/activity';
 import scheduleModule from '@/router/schedule';
+import documentModule from '@/router/document';
 
 const moudelArr = [
   {
@@ -80,6 +82,12 @@ const moudelArr = [
     component: Schedule,
     children: scheduleModule,
     redirect: { name: 'schedule_my' }
+  },{
+    path: 'document',
+    name: 'document',
+    component: Document,
+    children: documentModule,
+    redirect: { name: 'document_my' }
   }
 ]
 export default moudelArr;

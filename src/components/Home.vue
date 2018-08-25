@@ -231,6 +231,21 @@
                 menu: '日程提醒设置'
               }
             ]
+          },{
+            name:'document',
+            menu:'公文管理',
+            children: [
+              {
+                name:'document_my',
+                menu:'我的公文'
+              },{
+                name:'document_public',
+                menu:'公文发布'
+              },{
+                name:'document_verify',
+                menu:'公文审核'
+              }
+            ]
           }
         ]
       }
