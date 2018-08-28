@@ -318,7 +318,7 @@
             align: 'center',
             render: (h, params) => {
               const row = params.row;
-              const text = row === 1 ? '绝密' : row === 2 ? "机密" : "秘密"
+              const text = row.Rank === 1 ? '绝密' : row.Rank === 2 ? "机密" : "秘密"
               return h('span', text)
             }
           }, {
@@ -327,7 +327,7 @@
             align: 'center',
             render: (h, params) => {
               const row = params.row;
-              const text = row === 1 ? '特急' : "加急";
+              const text = row.Urgency === 1 ? '特急' : "加急";
               return h('span', text)
             }
           }, {
@@ -435,6 +435,7 @@
           Type:this.docType //类型
         };
         if (this.currentModal === 'add') {
+          obj.Status = 1;
           this.$http.post('Document/AddList', obj).then((res) => {
             if (res.status === 200 && res.data > 0) {
               this.$Message.success('增加成功');
@@ -446,6 +447,7 @@
           })
         }
         if (this.currentModal === 'edit') {
+          obj.Id = this.id;
           this.$http.post('Document/UpdList', obj).then((res) => {
             if (res.status === 200 && res.data > 0) {
               this.$Message.success('修改成功');

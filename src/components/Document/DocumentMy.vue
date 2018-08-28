@@ -134,7 +134,7 @@
             align: 'center',
             render: (h,params) => {
               const row = params.row;
-              const text = row === 1 ? '绝密' : row === 2 ? "机密" : "秘密"
+              const text = row.Rank === 1 ? '绝密' : row.Rank === 2 ? "机密" : "秘密";
               return h('span',text)
             }
           }, {
@@ -143,7 +143,7 @@
             align: 'center',
             render: (h,params) => {
               const row = params.row;
-              const text = row === 1 ? '特急' : "加急";
+              const text = row.Urgency === 1 ? '特急' : "加急";
               return h('span',text)
             }
           }, {

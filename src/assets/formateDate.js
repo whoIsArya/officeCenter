@@ -11,6 +11,8 @@
       return Y+'-'+M+'-'+D
     }else if(format === 'all'){
       return Y+'/'+M+'/'+D+ ' '+H+":"+m+":"+s
+    }else if(format === 'zi'){
+      return Y+'年'+M+'月'
     }else{
       return Y+'/'+M+'/'+D
     }

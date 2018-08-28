@@ -21,38 +21,38 @@
   .bbs-verify .search>div{
     margin-right: 20px;
   }
-  .bbs-verify .form-item {
+  .bbs-verify-modal .form-item {
     margin-bottom: 10px;
   }
-  .bbs-verify .form-item > span {
+  .bbs-verify-modal .form-item > span {
     width: 100px;
     display: inline-block;
     text-align: left;
   }
-  .bbs-verify .form-item > div{
+  .bbs-verify-modal .form-item > div{
     display: inline-block;
     width: 78%;
   }
-  .bbs-verify .form-item > div.content > p{
+  .bbs-verify-modal .form-item > div.content > p{
     word-wrap: break-word;
     word-break: normal;
   }
-  .bbs-verify .floor{
+  .bbs-verify-modal .floor{
     display: flex;
     align-items: flex-start;
   }
-  .bbs-verify .floor>div{
+  .bbs-verify-modal .floor>div{
     flex: 1;
     text-align: center;
     border: 1px solid #ddd;
   }
-  .bbs-verify .floor>.left-floor{
+  .bbs-verify-modal .floor>.left-floor{
     width: 20%;
     padding-top: 20px;
     height: 134px;
     flex: none;
   }
-  .bbs-verify .right-floor>.content-box{
+  .bbs-verify-modal .right-floor>.content-box{
     padding: 10px;
     height: 100px;
     border-bottom: 1px solid #ddd;;
@@ -77,7 +77,7 @@
       <Page :total="total" @on-change="changePage" :current.sync="currentPage" @on-page-size-change="changeLimit" show-total show-sizer show-elevator/>
     </div>
 
-    <Modal v-model="myModal" :title="modalTitle" :mask-closable="false" width="70%">
+    <Modal class="bbs-verify-modal" v-model="myModal" :title="modalTitle" :mask-closable="false" width="70%">
       <div v-if="currentModal==='check'">
         <p style="margin-bottom: 10px; background-color: #ddd">帖子标题：{{currentData.Title}}</p>
         <div class="floor">

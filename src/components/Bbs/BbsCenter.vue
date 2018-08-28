@@ -21,39 +21,39 @@
   .bbs-center .search>div{
     margin-right: 20px;
   }
-  .bbs-center .form-item {
+  .bbs-center-modal .form-item {
     margin-bottom: 10px;
   }
-  .bbs-center .form-item > span {
+  .bbs-center-modal .form-item > span {
     width: 100px;
     display: inline-block;
     text-align: left;
     vertical-align: top;
   }
-  .bbs-center .form-item > div{
+  .bbs-center-modal .form-item > div{
     display: inline-block;
     width: 78%;
   }
-  .bbs-center .form-item > div.content > p{
+  .bbs-center-modal .form-item > div.content > p{
     word-wrap: break-word;
     word-break: normal;
   }
-  .bbs-center .floor{
+  .bbs-center-modal .floor{
     display: flex;
     align-items: flex-start;
   }
-  .bbs-center .floor>div{
+  .bbs-center-modal .floor>div{
     flex: 1;
     text-align: center;
     border: 1px solid #ddd;
   }
-  .bbs-center .floor>.left-floor{
+  .bbs-center-modal .floor>.left-floor{
     width: 20%;
     padding-top: 20px;
     height: 134px;
     flex: none;
   }
-  .bbs-center .right-floor>.content-box{
+  .bbs-center-modal .right-floor>.content-box{
     padding: 10px;
     height: 100px;
     border-bottom: 1px solid #ddd;;
@@ -78,7 +78,7 @@
       <Page :total="total" @on-change="changePage" :current.sync="currentPage" @on-page-size-change="changeLimit" show-total show-sizer show-elevator/>
     </div>
 
-    <Modal v-model="myModal" :title="modalTitle" :mask-closable="false" width="70%">
+    <Modal class="bbs-center-modal" v-model="myModal" :title="modalTitle" :mask-closable="false" width="70%">
       <div v-if="currentModal === 'add'">
         <div class="form-item">
           <span style="vertical-align: top;">标题：</span>
@@ -216,16 +216,29 @@
             align: 'center',
             render: (h,params) => {
               const row = params.row;
-              return h('a', {
-                style: {
-                  color: '#2d8cf0'
-                },
-                on: {
-                  click: () => {
-                    this.handleEvent('check',row)
+              return h('div',[
+                h('a', {
+                  style: {
+                    color: '#2d8cf0',
+                    marginRight:'5px'
+                  },
+                  on: {
+                    click: () => {
+                      this.handleEvent('check',row)
+                    }
                   }
-                }
-              },'查看')
+                },'查看'),
+                h('a', {
+                  style: {
+                    color: '#2d8cf0'
+                  },
+                  on: {
+                    click: () => {
+                      this.collect(row)
+                    }
+                  }
+                },'收藏')
+              ])
             }
           }
         ],
@@ -303,6 +316,22 @@
 
       },
       //表格数据处理
+      collect:function(str){
+        console.log(str);
+        this.currentData = str;
+        let obj = {
+          Sysid: 0,
+          Name:'me',
+          NoteId:this.currentData.Id
+        }
+        this.$http.post('Collection/AddList',obj).then((res)=>{
+          if(res.status === 200 && res.data>0){
+            this.$Message.success('收藏成功');
+          }else{
+            this.$Message.error('收藏失败');
+          }
+        })
+      },
       handleEvent:function(str,row){
         this.currentModal = str;
         if(row){

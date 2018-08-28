@@ -1,46 +1,46 @@
 <style>
-  .oper-group{
+  .log-check .oper-group{
     width: 100%;
     text-align: right;
     padding: 20px 0 10px 0;
   }
-  .pagination{
+  .log-check .pagination{
     width: 100%;
     text-align: right;
     padding-top: 10px;
   }
-  .search{
+  .log-check .search{
     display: flex;
     align-items: center;
     padding-top: 20px;
   }
-  .search>.tip{
+  .log-check .search>.tip{
     font-weight: bold;
     margin-top: -2px;
   }
-  .search>div{
+  .log-check .search>div{
     margin-right: 20px;
   }
-  .form-item {
+  .log-check-modal .form-item {
     margin-bottom: 10px;
   }
-  .form-item > span {
+  .log-check-modal .form-item > span {
     width: 100px;
     display: inline-block;
     text-align: left;
     vertical-align: top;
   }
-  .form-item > div{
+  .log-check-modal .form-item > div{
     display: inline-block;
     width: 78%;
   }
-  .form-item > div.content > p{
+  .log-check-modal .form-item > div.content > p{
     word-wrap: break-word;
     word-break: normal;
   }
 </style>
 <template>
-  <div>
+  <div class="log-check">
     <div class="search">
       <div class="tip">查询条件</div>
       <div>
@@ -57,7 +57,7 @@
       <Page :total="total" @on-change="changePage" :current.sync="currentPage" @on-page-size-change="changeLimit" show-total show-sizer show-elevator/>
     </div>
 
-    <Modal v-model="myModal" :title="modalTitle" :mask-closable="false">
+    <Modal class="log-check-modal" v-model="myModal" :title="modalTitle" :mask-closable="false">
       <div>
         <div class="form-item">
           <span style="vertical-align: top;">内容：</span>

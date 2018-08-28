@@ -220,10 +220,12 @@
               },{
                 name: 'schedule_organization',
                 menu: '机构周工作安排'
-              },{
-                name: 'schedule_company',
-                menu: '单位周工作安排'
-              },{
+              },
+              // {
+              //   name: 'schedule_company',
+              //   menu: '单位周工作安排'
+              // },
+              {
                 name: 'schedule_resume',
                 menu: '工作简历'
               },{
